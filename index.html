@@ -1,0 +1,32 @@
+
+<html>
+    <head>
+        <title>Simple Barcode Scanner</title>
+        <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=mItyHviVK219jIODxK1i7TdJY82XLOxIcoR_CLMKcgdr_wzRltmL2uk6kTPvIsILsBIjhgJ9XZhbI4A6mzyi9PXvsMzJo0AGOV4eO-_iaUo" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9kb3dubG9hZHMuYmFzc2VsdGVjaC5jb20vdXNiX2JhcmNvZGVfc2FubmluZy5odG1s"/><script>
+            var barcode = '';
+            var interval;
+            document.addEventListener('keydown', function(evt) {
+                if (interval)
+                    clearInterval(interval);
+                if (evt.code == 'Enter') {
+                    if (barcode)
+                        handleBarcode(barcode);
+                    barcode = '';
+                    return;
+                }
+                if (evt.key != 'Shift')
+                    barcode += evt.key;
+                interval = setInterval(() => barcode = '', 20);
+            });
+
+            function handleBarcode(scanned_barcode) {
+                document.querySelector('#last-barcode').innerHTML = scanned_barcode;
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Simple Barcode Scanner</h1>
+        <strong>Last scanned barcode: </strong>
+        <div id="last-barcode"></div>
+    </body>
+</html>

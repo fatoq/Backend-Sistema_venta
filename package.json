@@ -1,0 +1,27 @@
+{
+  "name": "sistema_gestion_ventas",
+  "version": "1.0.0",
+  "description": "backend de un sistema_gestion_ventas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "backend",
+    "gestion_venta"
+  ],
+  "author": "Fausto Quizhpi",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
