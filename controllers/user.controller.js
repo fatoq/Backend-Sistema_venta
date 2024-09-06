@@ -52,18 +52,28 @@ var controller = {
             return res.status(500).send({ message: 'Error al eliminar Usuario' });
         });
     },
-    updateUser:function(req,res){
+    updateUser: async function (req, res) {
         var userId = req.params.id;
         var update = req.body;
-        User.findByIdAndUpdate(userId, update, { new: true }).then(userUpdated => {
-            if (!userUpdated) {
+        try {
+            // Encontrar el usuario por ID
+            var user = await User.findById(userId);
+            if (!user) {
                 return res.status(404).send({ message: 'Usuario no encontrado' });
             }
+            if (update.nombre) user.nombre = update.nombre;
+            if (update.apellido) user.apellido = update.apellido;
+            if (update.email) user.email = update.email;
+            if (update.password) user.password = update.password;
+            if (update.role) user.role = update.role;    
+            // encripta la clave 
+            const userUpdated = await user.save();
             return res.status(200).send({ message: 'Usuario actualizado correctamente', user: userUpdated });
-        }).catch(err => {
-            return res.status(500).send({ message: 'Error al actualizar Usuario' });
-        });
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al actualizar Usuario', error: err });
+        }
     },
+    
     getUsers: function (req, res) {
         User.find().then(users => {
             if (!users) {

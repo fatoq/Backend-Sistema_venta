@@ -9,7 +9,7 @@ var ProductSchema = Schema({
     stock: { type: Number, required: true },
     precio: { type: Number, required: true },
     disponible: { type: Boolean, default: true },
-    vendido: { type: Number, default: 0 },
+    vendidos: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

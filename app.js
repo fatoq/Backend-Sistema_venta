@@ -4,6 +4,7 @@ var express=require('express');
 var bodyParse=require('body-parser');
 var app=express();
 var userRoutes=require('./routes/user.routes');
+var productRoutes=require('./routes/productos_routes');
 app.use(bodyParse.urlencoded({extended:false}));
 app.use(bodyParse.json());
 
@@ -18,5 +19,5 @@ app.use((req,res,next)=>{
 });
 
 //Rutas
-app.use('/',userRoutes);
+app.use('/',userRoutes,productRoutes);
 module.exports=app;
