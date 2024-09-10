@@ -7,7 +7,17 @@ var userRoutes=require('./routes/user.routes');
 var productRoutes=require('./routes/productos_routes');
 app.use(bodyParse.urlencoded({extended:false}));
 app.use(bodyParse.json());
+const cors = require('cors');
+const bodyParser = require('body-parser'); 
+// Configuración de CORS
+const corsOptions = {
+    origin: 'http://localhost:3000',  // la direccion del frontend
+    optionsSuccessStatus: 200
+}
 
+app.use(cors(corsOptions));
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json())
 //cabeceras van a procesar los metodos y control de acceso HTTP
 app.use((req,res,next)=>{
     res.header('Access-Control-Allow-Origin','*');
