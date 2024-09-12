@@ -7,9 +7,7 @@ const { body, validationResult } = require('express-validator');
 var controller = {
     validateUserCreation: [
         body('email').isEmail().withMessage('Introduce un email válido.'),
-        body('password')
-        .isLength({ min: 6 })
-        .withMessage('La contraseña debe tener al menos 6 caracteres.'),
+        body('password').isLength({ min:6}).withMessage('La contraseña debe tener al menos 6 caracteres.'),
         body('nombre').isAlpha().withMessage('El nombre solo debe contener letras.'),
         body('apellido').isAlpha().withMessage('El apellido solo debe contener letras.'),
     ],
@@ -132,7 +130,35 @@ var controller = {
         // Añadir el token a la lista negra
         blacklistedTokens.push(token);
     return res.status(200).send({ message: 'Logout exitoso' });
-}
+},
+    //para cambiar contraseña en caso de perdida 
+    forgotPassword: async function (req,res) {
+        const {email,newPassword,confirmPassword} = req.body;
+        //ver si existe el email
+        try{
+            console.log("Email recibido para cambiar contraseña:", email);
+            const user = await User.findOne({email});
+            if(!user){
+                return res.status(404).send({message:'Usuario no encontrado'});
+            }
+            //verificar que la nueva contraseña y su confirmación coincidan
+            if(newPassword!== confirmPassword){
+                return res.status(400).send({message:'Las contraseñas no coinciden'});
+            }
+            //nueva contraseña tenga al menos 6 caracteres
+            if (newPassword.length < 6) {
+            return res.status(400).send({message: 'La contraseña debe tener al menos 6 caracteres'});
+            }
+            //nueva contraseña 
+            user.password = newPassword;
+            //encriptar la nueva contraseña y se guarda
+            await user.save();
+            console.log("Contraseña cambiada correctamente");
+            return res.status(200).send({ message: 'Contraseña cambiada correctamente' });
+        } catch (error){
+            return res.status(500).send({ message: 'Error en el SERVIDOR', error });
+        }
+    }
 };
 
 module.exports = controller;

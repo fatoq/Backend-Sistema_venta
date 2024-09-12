@@ -26,6 +26,8 @@ router.get('/get-user/:id',userController.getUser);
 router.post('/login',userController.login);
 //para el logout del usuario
 router.get('/logout',authenticateToken,userController.logout);
+//para olvide mi contraseña
+router.post('/forgot-password',userController.forgotPassword);
 
 
 module.exports=router;

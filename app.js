@@ -1,12 +1,13 @@
 //Para establecer metodos, rutas 
 'use strict'
 var express=require('express');
-var bodyParse=require('body-parser');
+//var bodyParse=require('body-parser');
 var app=express();
 var userRoutes=require('./routes/user.routes');
 var productRoutes=require('./routes/productos_routes');
-app.use(bodyParse.urlencoded({extended:false}));
-app.use(bodyParse.json());
+var ventasRoutes=require('./routes/ventas_routes');
+app.use(express.urlencoded({extended:false}));
+app.use(express.json());
 
 //cabeceras van a procesar los metodos y control de acceso HTTP
 app.use((req,res,next)=>{
@@ -19,5 +20,5 @@ app.use((req,res,next)=>{
 });
 
 //Rutas
-app.use('/',userRoutes,productRoutes);
+app.use('/',userRoutes,productRoutes,ventasRoutes);
 module.exports=app;
