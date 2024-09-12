@@ -129,62 +129,34 @@ var controller = {
         const token = authHeader.replace('Bearer ', ''); // Eliminar 'Bearer ' del token
         // Añadir el token a la lista negra
         blacklistedTokens.push(token);
-    return res.status(200).send({ message: 'Logout exitoso' });
-},
+        console.log("Logout exitoso");
+        return res.status(200).send({ message: 'Logout exitoso' });
+    },
     //para cambiar contraseña en caso de perdida 
-    /*forgotPassword: async function (req,res) {
-        const {email,newPassword,confirmPassword} = req.body;
-        //ver si existe el email
-        try{
-            console.log("Email recibido para cambiar contraseña:", email);
-            const user = await User.findOne({email});
-            if(!user){
-                return res.status(404).send({message:'Usuario no encontrado'});
+    
+    forgotPassword: async function (req, res) {
+        const { email, newPassword, confirmPassword } = req.body;
+         try {
+            console.log("Email recibido:", email);
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(404).send({ message: 'Usuario no encontrado' });
             }
-            //verificar que la nueva contraseña y su confirmación coincidan
-            if(newPassword!== confirmPassword){
-                return res.status(400).send({message:'Las contraseñas no coinciden'});
+            // Si solo se envía el email, consideramos que es una verificación
+            if (!newPassword && !confirmPassword) {
+                 return res.status(200).send({ message: 'Usuario encontrado', verified: true });
             }
-            //nueva contraseña tenga al menos 6 caracteres
+            // Si se envían las contraseñas, procedemos con el cambio
+            if (newPassword !== confirmPassword) {
+                return res.status(400).send({ message: 'Las contraseñas no coinciden' });
+            }
             if (newPassword.length < 6) {
-            return res.status(400).send({message: 'La contraseña debe tener al menos 6 caracteres'});
-            }
-            //nueva contraseña 
+                return res.status(400).send({ message: 'La contraseña debe tener al menos 6 caracteres' });
+            } 
             user.password = newPassword;
-            //encriptar la nueva contraseña y se guarda
             await user.save();
             console.log("Contraseña cambiada correctamente");
             return res.status(200).send({ message: 'Contraseña cambiada correctamente' });
-        } catch (error){
-            return res.status(500).send({ message: 'Error en el SERVIDOR', error });
-        }
-    }*/
-        forgotPassword: async function (req, res) {
-            const { email, newPassword, confirmPassword } = req.body;
-            try {
-                console.log("Email recibido:", email);
-                const user = await User.findOne({ email });
-                if (!user) {
-                    return res.status(404).send({ message: 'Usuario no encontrado' });
-                }
-        
-                // Si solo se envía el email, consideramos que es una verificación
-                if (!newPassword && !confirmPassword) {
-                    return res.status(200).send({ message: 'Usuario encontrado', verified: true });
-                }
-        
-                // Si se envían las contraseñas, procedemos con el cambio
-                if (newPassword !== confirmPassword) {
-                    return res.status(400).send({ message: 'Las contraseñas no coinciden' });
-                }
-                if (newPassword.length < 6) {
-                    return res.status(400).send({ message: 'La contraseña debe tener al menos 6 caracteres' });
-                }
-        
-                user.password = newPassword;
-                await user.save();
-                console.log("Contraseña cambiada correctamente");
-                return res.status(200).send({ message: 'Contraseña cambiada correctamente' });
             } catch (error) {
                 console.error("Error en forgotPassword:", error);
                 return res.status(500).send({ message: 'Error en el SERVIDOR', error: error.message });
