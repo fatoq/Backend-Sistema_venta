@@ -21,7 +21,7 @@ const createSuperadmin = async () => {
         const superadmin = new User({
             nombre: 'Super',
             apellido: 'Admin',
-            email: 'admin',
+            email: 'admin@admin.com',
             password: 'admin', 
             role: 'Super-admin',
         });
