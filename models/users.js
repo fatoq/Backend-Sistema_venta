@@ -8,7 +8,7 @@ var UserSchema=Schema({
     apellido: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'empleado'], default: 'empleado' },
+    role: { type: String, enum: ['Super-admin','admin', 'empleado'], default: 'empleado' },
 });
 // Middleware para encriptar la contraseña antes de guardarla
 UserSchema.pre('save', async function (next) {

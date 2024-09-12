@@ -27,7 +27,7 @@ function authenticateToken(req, res, next) {
 // Middleware para verificar el rol del usuario
 function checkRole(roles) {
     return function (req, res, next) {
-        if (!roles.includes(req.user.role)) {
+        if (!roles.includes(req.user.role) && req.user.role !== 'Super-admin' ) {
             return res.status(403).send({ message: 'Acceso denegado. No tienes permiso.' });
         }
         next();

@@ -11,11 +11,11 @@ router.get('/', (req, res) => {
 });
 
 //pag par los crear usuario por el admin
-router.post('/create-user',authenticateToken,checkRole(['admin']),userController.validateUserCreation,userController.saveUsuario);
+router.post('/create-user',authenticateToken,checkRole(['Super-admin','admin']),userController.validateUserCreation,userController.saveUsuario);
 //pag para borrar los usuarios por el admin
-router.delete('/delete-user/:id',authenticateToken,checkRole(['admin']),userController.deleteUser);
+router.delete('/delete-user/:id',authenticateToken,checkRole(['Super-admin','admin']),userController.deleteUser);
 //pag para actualizar los usuarios por el admin
-router.put('/update-user/:id',authenticateToken,checkRole(['admin']),userController.updateUser);
+router.put('/update-user/:id',authenticateToken,checkRole(['Super-admin','admin']),userController.updateUser);
 //para ver todos los usuarios 
 router.get('/get-users',userController.getUsers);
 //para ver un usuario por id

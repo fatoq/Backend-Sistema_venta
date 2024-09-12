@@ -11,15 +11,15 @@ router.get('/product',(req,res)=> {
 });
 
 //para crear un producto
-router.post('/create-product',authenticateToken,checkRole(['admin','empleado']), productController.createProduct);
+router.post('/create-product',authenticateToken,checkRole(['Super-admin','admin','empleado']), productController.createProduct);
 //para borrar un producto
-router.delete('/delete-product/:codigoBarra',authenticateToken,checkRole(['admin']), productController.deleteProduct);
+router.delete('/delete-product/:codigoBarra',authenticateToken,checkRole(['Super-admin','admin']), productController.deleteProduct);
 //para actualizar un producto
-router.put('/update-product/:codigoBarra',authenticateToken,checkRole(['admin','empleado']), productController.updateProduct);
+router.put('/update-product/:codigoBarra',authenticateToken,checkRole(['Super-admin','admin','empleado']), productController.updateProduct);
 //para ver todos los productos
-router.get('/get-products/',authenticateToken,checkRole(['admin','empleado']), productController.getAllProducts);
+router.get('/get-products/',authenticateToken,checkRole(['Super-admin','admin','empleado']), productController.getAllProducts);
 //Para ver un producto por codigo de barra
-router.get('/get-product-barra/:codigoBarra',authenticateToken,checkRole(['admin','empleado']), productController.getProductByCode);
+router.get('/get-product-barra/:codigoBarra',authenticateToken,checkRole(['Super-admin','admin','empleado']), productController.getProductByCode);
 
 
 
