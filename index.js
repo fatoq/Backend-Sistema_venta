@@ -12,7 +12,7 @@ var bcrypt = require('bcryptjs');
 const createSuperadmin = async () => {
     try {        
         // Verificar si el superadmin ya existe
-        const existingSuperadmin = await User.findOne({ email: 'admin' });
+        const existingSuperadmin = await User.findOne({ email: 'admin@admin.com' });
         if (existingSuperadmin) {
             console.log('El superadmin ya existe');
             return;

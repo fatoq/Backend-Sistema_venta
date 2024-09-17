@@ -1,5 +1,5 @@
 'use strict'
-var ventasController = require('../controllers/product.controller');
+var ventasController = require('../controllers/ventas.controller');
 var express = require('express');
 var router = express.Router();
 
@@ -10,7 +10,7 @@ router.get('/ventas', (req, res) => {
 });
 
 //para crear una venta
-//router.post('/create-venta', ventasController.createVenta);
+router.post('/create-venta', ventasController.createVenta);
 /*
 //para borrar una venta
 router.delete('/delete-venta/:id', ventasController.deleteVenta);

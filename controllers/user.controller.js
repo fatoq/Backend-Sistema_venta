@@ -1,27 +1,27 @@
 'use strict'
 const jwt = require('jsonwebtoken');
-var User=require('../models/users');
-const {blacklistedTokens} = require('../middleware/auth'); 
+var User = require('../models/users');
+const { blacklistedTokens } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 var controller = {
     validateUserCreation: [
         body('email').isEmail().withMessage('Introduce un email válido.'),
-        body('password').isLength({ min:6}).withMessage('La contraseña debe tener al menos 6 caracteres.'),
+        body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres.'),
         body('nombre').isAlpha().withMessage('El nombre solo debe contener letras.'),
         body('apellido').isAlpha().withMessage('El apellido solo debe contener letras.'),
     ],
 
     saveUsuario: async function (req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-    }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         var user = new User();
         var params = req.body;
         user.nombre = params.nombre;
         user.apellido = params.apellido;
-        user.email = params.email; 
+        user.email = params.email;
         user.password = params.password;
         user.role = params.role;
         try {
@@ -30,16 +30,16 @@ var controller = {
             if (userExist) {
                 return res.status(400).send({ message: 'El email ya está registrado' });
             }
-          // Encriptar la contraseña solo una vez y verificar
-        console.log('Contraseña sin hash:', params.password);
-        console.log('Contraseña con hash:', user.password);
+            // Encriptar la contraseña solo una vez y verificar
+            console.log('Contraseña sin hash:', params.password);
+            console.log('Contraseña con hash:', user.password);
             var userSave = await user.save();
             return res.status(200).send({ user: userSave });
         } catch (err) {
             return res.status(500).send({ message: 'Error al crear Usuario' });
         }
     },
-    deleteUser:function(req,res){
+    deleteUser: function (req, res) {
         var userId = req.params.id;
         User.findByIdAndDelete(userId).then(userRemoved => {
             if (!userRemoved) {
@@ -63,7 +63,7 @@ var controller = {
             if (update.apellido) user.apellido = update.apellido;
             if (update.email) user.email = update.email;
             if (update.password) user.password = update.password;
-            if (update.role) user.role = update.role;    
+            if (update.role) user.role = update.role;
             // encripta la clave 
             const userUpdated = await user.save();
             return res.status(200).send({ message: 'Usuario actualizado correctamente', user: userUpdated });
@@ -71,7 +71,7 @@ var controller = {
             return res.status(500).send({ message: 'Error al actualizar Usuario', error: err });
         }
     },
-    
+
     getUsers: function (req, res) {
         User.find().then(users => {
             if (!users) {
@@ -92,31 +92,31 @@ var controller = {
         }).catch(err => {
             return res.status(500).send({ message: 'Error al obtener Usuario' });
         });
-    },   
+    },
     //para el ingreso de session
-    login: async function(req,res){
-        const {email,password}= req.body;
-        try{
+    login: async function (req, res) {
+        const { email, password } = req.body;
+        try {
             console.log("Datos recibidos - Email:", email, "Password:", password);
-            const user = await User.findOne({email});
-            if(!user){
-                return res.status(404).send({message:'Usuario no encontrado'});
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(404).send({ message: 'Usuario no encontrado' });
             }
             console.log('Contraseña recibida:', password); // Verificar la contraseña recibida
             const validPassword = await user.comparePassword(password);
             console.log('¿Contraseña válida?:', validPassword);      // Verificar si la contraseña es válida
-            if(!validPassword){
-                return res.status(401).send({message:'Contraseña incorrecta'});
+            if (!validPassword) {
+                return res.status(401).send({ message: 'Contraseña incorrecta' });
             }
             //uso del jwt
             const token = jwt.sign(
-                {userId:user._id, role:user.role},
+                { userId: user._id, role: user.role },
                 'your-secret-key',
-                { expiresIn: '24h'}
+                { expiresIn: '24h' }
             );
             console.log("Login exitoso");
-            return res.status(200).send({ message: 'Login exitoso',token, user });
-        } catch (error){
+            return res.status(200).send({ message: 'Login exitoso', token, user });
+        } catch (error) {
             return res.status(500).send({ message: 'Error en el SERVIDOR', error });
         }
     },
@@ -133,10 +133,10 @@ var controller = {
         return res.status(200).send({ message: 'Logout exitoso' });
     },
     //para cambiar contraseña en caso de perdida 
-    
+
     forgotPassword: async function (req, res) {
         const { email, newPassword, confirmPassword } = req.body;
-         try {
+        try {
             console.log("Email recibido:", email);
             const user = await User.findOne({ email });
             if (!user) {
@@ -144,7 +144,7 @@ var controller = {
             }
             // Si solo se envía el email, consideramos que es una verificación
             if (!newPassword && !confirmPassword) {
-                 return res.status(200).send({ message: 'Usuario encontrado', verified: true });
+                return res.status(200).send({ message: 'Usuario encontrado', verified: true });
             }
             // Si se envían las contraseñas, procedemos con el cambio
             if (newPassword !== confirmPassword) {
@@ -152,16 +152,16 @@ var controller = {
             }
             if (newPassword.length < 6) {
                 return res.status(400).send({ message: 'La contraseña debe tener al menos 6 caracteres' });
-            } 
+            }
             user.password = newPassword;
             await user.save();
             console.log("Contraseña cambiada correctamente");
             return res.status(200).send({ message: 'Contraseña cambiada correctamente' });
-            } catch (error) {
-                console.error("Error en forgotPassword:", error);
-                return res.status(500).send({ message: 'Error en el SERVIDOR', error: error.message });
-            }
+        } catch (error) {
+            console.error("Error en forgotPassword:", error);
+            return res.status(500).send({ message: 'Error en el SERVIDOR', error: error.message });
         }
+    }
 };
 
 module.exports = controller;
