@@ -111,7 +111,7 @@ var controller = {
             //uso del jwt
             const token = jwt.sign(
                 { userId: user._id, role: user.role },
-                'your-secret-key',
+                'ventas-tiendas',
                 { expiresIn: '24h' }
             );
             console.log("Login exitoso");

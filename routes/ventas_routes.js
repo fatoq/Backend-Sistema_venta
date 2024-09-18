@@ -2,6 +2,8 @@
 var ventasController = require('../controllers/ventas.controller');
 var express = require('express');
 var router = express.Router();
+const { authenticateToken, checkRole } = require('../middleware/auth');
+
 
 //Rutas para ventas
 
@@ -10,14 +12,16 @@ router.get('/ventas', (req, res) => {
 });
 
 //para crear una venta
-router.post('/create-venta', ventasController.createVenta);
+router.post('/create-venta',authenticateToken,ventasController.createVenta);
+//para ver todas las ventas
+router.get('/get-ventas', authenticateToken,checkRole(['Super-admin','admin','empleado']),
+ventasController.getVentas);
 /*
 //para borrar una venta
 router.delete('/delete-venta/:id', ventasController.deleteVenta);
 //para actualizar una venta
 router.put('/update-venta/:id', ventasController.updateVenta);
-//para ver todas las ventas
-router.get('/get-ventas', ventasController.getAllVentas);
+
 //Para ver una venta por id
 router.get('/get-venta/:id', ventasController.getVenta);
 //Para ver una venta por fecha
