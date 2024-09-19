@@ -47,8 +47,8 @@ var controller = {
         }
     },
     updateProduct: async function (req, res) {
-        var { codigoBarra } = req.params;
-        var { nombre, categoria, stock, precio } = req.body;
+        var {codigoBarra} = req.params;
+        var {nombre, categoria, stock, precio} = req.body;
         try {
             if (precio) {
                 precio = precio.toString().replace(',', '.');

@@ -70,8 +70,8 @@ var controller = {
                 ]);
             } else {
                 ventas = await Venta.find({ usuario: req.user.userId })
-                    .populate('usuario', 'nombre apellido')  // Aquí puedes el nombre y apellido del empleado
-                    .populate('productos.producto', 'nombre categoria codigoBarra'); // Aquí puedes los detalles del producto
+                    .populate('usuario', 'nombre apellido')  // Aquí esta el nombre y apellido del empleado
+                    .populate('productos.producto', 'nombre categoria codigoBarra'); // Aquí esta los detalles del producto
             }
             if (!ventas || ventas.length == 0) {
                 return res.status(404).send({ message: 'No hay ventas registradas' });  // No hay ventas registradas para este usuario
@@ -80,7 +80,63 @@ var controller = {
         } catch (err) {
             return res.status(500).send({ message: 'Error al obtener las ventas', error: err.message });
         }
+    },
+    updateVenta: async function (req, res) {
+        const {ventaId} = req.params;
+        const {productos} = req.body; // Los productos nuevos o actualizados
+        let total = 0;
+        let ventaProductos = [];
+        try {
+            // Encontrar la venta por ID
+            let venta = await Venta.findById(ventaId);
+            console.log('ID de venta recibido:', ventaId);
+            if (!venta) {
+                return res.status(404).send({message:'Venta no encontrada'});
+            }
+            // Iterar sobre los productos enviados para agregar o actualizar en la venta
+            for (let i = 0; i < productos.length; i++) {
+                let {codigoBarra, cantidad} = productos[i];
+                // Encontrar el producto en la base de datos
+                let product = await Product.findOne({codigoBarra});
+                if (!product) {
+                    return res.status(404).send({ message: `Producto con código de barras ${codigoBarra} no encontrado` });
+                }
+                // Verificar si el stock es suficiente
+                if (product.stock < cantidad) {
+                    return res.status(400).send({ message:`Stock insuficiente para el producto ${product.nombre}`});
+                }               
+                // Restar la cantidad del stock del producto
+                product.stock -= cantidad;
+                await product.save();
+                // Actualizar el total de la venta
+                total += product.precio * cantidad;
+                // Guardar los productos en el array de la venta
+                ventaProductos.push({ producto: product._id, cantidad });
+            }
+            // Actualizar los productos y el total de la venta
+            venta.productos = ventaProductos;
+            venta.total = total;
+            // Guardar la venta actualizada
+            let ventaActualizada = await venta.save();
+            return res.status(200).send({ message: 'Venta actualizada exitosamente', venta: ventaActualizada });
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al actualizar la venta', error: err.message });
+        }
+    },
+    deleteVenta: async function (req, res) {
+        const {ventaId} = req.params;
+        try {
+            // Encontrar y eliminar la venta por ID
+            let venta = await Venta.findByIdAndDelete(ventaId);
+            if (!venta) {
+                return res.status(404).send({ message: 'Venta no encontrada' });
+            }
+            return res.status(200).send({ message: 'Venta eliminada exitosamente' });
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al eliminar la venta', error: err.message });
+        }
     }
+
 };
 
 module.exports = controller;
