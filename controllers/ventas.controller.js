@@ -31,10 +31,8 @@ var controller = {
                 productos: ventaProductos,
                 total
             });
-
             var ventaGuardada = await venta.save();
             return res.status(200).send({ message: 'Venta registrada exitosamente', venta: ventaGuardada });
-
         } catch (err) {
             return res.status(500).send({ message: 'Error al registrar la venta', error: err.message });
         }
@@ -65,7 +63,8 @@ var controller = {
                                 total: '$total',
                                 fecha: '$fecha'
                             }
-                        }
+                        },
+                        totalVentas: { $sum: '$total' }
                     }
                 }
                 ]);

@@ -17,7 +17,7 @@ function authenticateToken(req, res, next) {
 
     try {
         // Verificar el token
-        const verified = jwt.verify(token, 'your-secret-key');
+        const verified = jwt.verify(token, 'ventas-tiendas');
         req.user = verified;  // Asignar los datos del usuario
         next();
     } catch (err) {
