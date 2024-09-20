@@ -1,6 +1,5 @@
 'use strict'
 var productController=require('../controllers/product.controller');
-var userController=require('../controllers/user.controller');
 const { authenticateToken , checkRole } = require('../middleware/auth');
 var express = require('express');
 var router = express.Router();
