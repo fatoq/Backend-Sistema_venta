@@ -1,11 +1,10 @@
-'use strict';
+'use strict'
 var mongoose=require('mongoose');
 var Schema=mongoose.Schema;
 
 var VentaSchema=Schema({
     usuario: { 
         type: Schema.Types.ObjectId, ref: 'User', required: true
-        
     },
     productos: [{
         producto: { type: Schema.Types.ObjectId, ref: 'Product', required: true },

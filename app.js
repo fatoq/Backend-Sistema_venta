@@ -6,6 +6,7 @@ var app=express();
 var userRoutes=require('./routes/user.routes');
 var productRoutes=require('./routes/productos_routes');
 var ventasRoutes=require('./routes/ventas_routes');
+var notasRoutes=require('./routes/nota_routes');
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());
 
@@ -20,5 +21,5 @@ app.use((req,res,next)=>{
 });
 
 //Rutas
-app.use('/',userRoutes,productRoutes,ventasRoutes);
+app.use('/',userRoutes,productRoutes,ventasRoutes,notasRoutes);
 module.exports=app;
