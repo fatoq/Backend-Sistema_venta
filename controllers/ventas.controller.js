@@ -95,6 +95,10 @@ var controller = {
             if (!venta) {
                 return res.status(404).send({message:'Venta no encontrada'});
             }
+            //para actualizar solo los que hacen su propias ventas
+            if (req.user.userId.toString() !== venta.usuario.toString()) {
+                return res.status(403).send({ message: 'No tienes permiso para modificar esta venta' });
+            }            
             //para actualizar la cantidad del stock de los productos vendidos
             for (let i = 0; i < venta.productos.length; i++) {
                 let ventaProducto = venta.productos[i];
