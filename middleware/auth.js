@@ -7,14 +7,11 @@ function authenticateToken(req, res, next) {
     if (!authHeader) {
         return res.status(401).send({ message: 'Acceso denegado. No hay token.' });
     }
-
     const token = authHeader.replace('Bearer ', ''); // Eliminar 'Bearer ' del token
-
     // Verificar si el token está en la lista negra
     if (blacklistedTokens.includes(token)) {
         return res.status(403).send({ message: 'Token inválido. Ya has cerrado sesión.' });
     }
-
     try {
         // Verificar el token
         const verified = jwt.verify(token, 'ventas-tiendas');

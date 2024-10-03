@@ -10,7 +10,11 @@ router.get('/notas', (req, res) => {
     res.status(200).send('<h1>Bienvenido a la API de Notas</h1>');
 });
 //para crear una nota
-router.post('/create-nota', authenticateToken,checkRole(['Super-admin','admin','empleado']),notaController.createNotaVenta);
+router.post('/create-nota'
+    //, authenticateToken,checkRole(['Super-admin','admin','empleado'])
+    ,notaController.createNotaVenta);
 //para generar la nota en pdf
-router.get('/nota-pdf/:notaVentaId',authenticateToken,checkRole(['Super-admin','admin','empleado']), notaController.genenNotaventa);
+router.get('/nota-pdf/:notaVentaId'
+    //,authenticateToken,checkRole(['Super-admin','admin','empleado'])
+    , notaController.genenNotaventa);
 module.exports = router;

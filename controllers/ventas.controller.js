@@ -15,12 +15,14 @@ var controller = {
                     return res.status(404).send({ message: 'Producto no encontrado', error: `El producto con el código de barras ${codigoBarra} no existe` });
                 }
                 // Verifica si el stock del producto es suficiente para la cantidad pedida
-                console.log('Stock actual del producto:', product.stock);
+                console.log(`Stock actual del producto (${product.nombre}):`, product.stock);
                 if (product.stock < cantidad) {
                     return res.status(400).send({ message: `Stock insuficiente para el producto ${product.nombre}` });
                 }
                 // Restar la cantidad del stock
-                product.stock -= cantidad;
+                let stockini= product.stock;
+                product.stock = product.stock - cantidad;
+                console.log(`Stock del producto (${product.nombre}) después de la venta: ${stockini} - ${cantidad} = ${product.stock}`);
                 await product.save();
                 total += product.precio * cantidad;
                 ventaProductos.push({ producto: product._id, cantidad });
@@ -92,6 +94,17 @@ var controller = {
             console.log('ID de venta recibido:', ventaId);
             if (!venta) {
                 return res.status(404).send({message:'Venta no encontrada'});
+            }
+            //para actualizar la cantidad del stock de los productos vendidos
+            for (let i = 0; i < venta.productos.length; i++) {
+                let ventaProducto = venta.productos[i];
+                let product = await Product.findById(ventaProducto.producto);
+                if (product) {
+                    // para renovar la cantidad del stock del producto
+                    product.stock += ventaProducto.cantidad;
+                    await product.save();
+                    console.log(`Stock restaurado para el producto ${product.nombre}. Stock actual: ${product.stock}`);
+                }
             }
             // Iterar sobre los productos enviados para agregar o actualizar en la venta
             for (let i = 0; i < productos.length; i++) {

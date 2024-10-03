@@ -6,8 +6,7 @@ mongoose.set("strictQuery",false);
 var app=require('./app');
 
 var app = require('./app');
-var User = require('./models/users'); // Asegúrate de que la ruta sea correcta
-var bcrypt = require('bcryptjs'); 
+var User = require('./models/users');
 
 const createSuperadmin = async () => {
     try {        
