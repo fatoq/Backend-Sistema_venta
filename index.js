@@ -1,11 +1,9 @@
 'use strict'
 var mongoose=require('mongoose');
 var port='3600';
-mongoose.promise=global.Promise;
+//mongoose.promise=global.Promise;
 mongoose.set("strictQuery",false);
 var app=require('./app');
-
-var app = require('./app');
 var User = require('./models/users');
 
 const createSuperadmin = async () => {
