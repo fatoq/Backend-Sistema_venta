@@ -10,9 +10,9 @@ var controller = {
         // Reemplazar comas por puntos y convertir a número
         if (precio) {
             precio = precio.toString().replace(',', '.');
-            const regex = /^[0-9]+(\.[0-9]{1,2})?$/;
-            if (!regex.test(precio)) {
-                return res.status(400).send({ message: 'El precio debe ser un número válido con hasta dos decimales' });
+            const cadena = /^[0-9]+(\.[0-9]{1,2})?$/;
+            if (!cadena.test(precio)) {
+                return res.status(400).send({ message:'El precio debe ser un número válido con hasta dos decimales'});
             }
             precio = parseFloat(precio);
         }

@@ -10,6 +10,7 @@ var ProductSchema = Schema({
     precio: { type: Number, required: true}
 });
 //transformar y validar el precio
+/*
 ProductSchema.pre('save', function(next) {
     console.log('Precio antes de transformación:', this.precio);
     if (this.precio) {
@@ -26,6 +27,5 @@ ProductSchema.pre('save', function(next) {
     }
     next();
 });
-
-
+*/
 module.exports = mongoose.model('Product', ProductSchema);
