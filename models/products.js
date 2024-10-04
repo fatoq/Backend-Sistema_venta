@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var ProductSchema = Schema({
-    codigoBarra: { type: String, required: true, unique: true },
+    codigoBarra: { type: String, required: true, unique: true, trim:true },
     nombre: { type: String, required: true },
     categoria: { type: String, required: true },
     stock: { type: Number, required: true },
