@@ -144,9 +144,9 @@ var controller = {
         const {ventaId} = req.params;
         console.log("ventaId recibido en backend:", ventaId); // Confirmar `ventaId` en backend
         try {
-            // Encontrar y eliminar la venta por ID
-            let venta = await Venta.findByIdAndDelete(ventaId);
-            if (!venta) {
+            // Encontrar y eliminar la venta por id
+            let ventaDeleted = await Venta.findByIdAndDelete(ventaId);
+            if (!ventaDeleted) {
                 return res.status(404).send({ message: 'Venta no encontrada' });
             }
             return res.status(200).send({ message: 'Venta eliminada exitosamente' });

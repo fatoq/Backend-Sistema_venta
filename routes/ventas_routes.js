@@ -15,6 +15,6 @@ router.get('/get-ventas', authenticateToken,checkRole(['Super-admin','admin','em
 //para actualizar una venta
 router.put('/update-venta/:ventaId', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.updateVenta);
 //para borrar una venta
-router.delete('/delete-venta/:ventaId', authenticateToken,checkRole(['Super-admin','admin']),ventasController.deleteVenta);
+router.delete('/delete-venta/:ventaId',authenticateToken,checkRole(['Super-admin','admin']),ventasController.deleteVenta);
 
 module.exports = router;
