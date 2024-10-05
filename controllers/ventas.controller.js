@@ -142,6 +142,7 @@ var controller = {
     },
     deleteVenta: async function (req, res) {
         const {ventaId} = req.params;
+        console.log("ventaId recibido en backend:", ventaId); // Confirmar `ventaId` en backend
         try {
             // Encontrar y eliminar la venta por ID
             let venta = await Venta.findByIdAndDelete(ventaId);
