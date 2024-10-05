@@ -61,6 +61,7 @@ var controller = {
                         apellido: { $first: '$usuarioDetalle.apellido' },
                         ventas: {
                             $push: {
+                                _id: '$_id',
                                 productos: '$productos',
                                 total: '$total',
                                 fecha: '$fecha'
@@ -91,12 +92,15 @@ var controller = {
         try {
             // Encontrar la venta por ID
             let venta = await Venta.findById(ventaId);
-            console.log('ID de venta recibido:', ventaId);
+            
+            console.log('Productos recibidos para actualizar:', productos);
             if (!venta) {
+                console.log('Venta no encontrada');
                 return res.status(404).send({message:'Venta no encontrada'});
             }
             //para actualizar solo los que hacen su propias ventas
             if (req.user.userId.toString() !== venta.usuario.toString()) {
+                console.log('Permiso denegado: El usuario no es el creador de la venta');
                 return res.status(403).send({ message: 'No tienes permiso para modificar esta venta' });
             }            
             //para actualizar la cantidad del stock de los productos vendidos
@@ -135,6 +139,7 @@ var controller = {
             venta.total = total;
             // Guardar la venta actualizada
             let ventaActualizada = await venta.save();
+            console.log('Venta actualizada exitosamente:', ventaActualizada);
             return res.status(200).send({ message: 'Venta actualizada exitosamente', venta: ventaActualizada });
         } catch (err) {
             return res.status(500).send({ message: 'Error al actualizar la venta', error: err.message });
@@ -142,7 +147,7 @@ var controller = {
     },
     deleteVenta: async function (req, res) {
         const {ventaId} = req.params;
-        console.log("ventaId recibido en backend:", ventaId); // Confirmar `ventaId` en backend
+        console.log("ventaId recibido en backend:", ventaId); 
         try {
             // Encontrar y eliminar la venta por id
             let ventaDeleted = await Venta.findByIdAndDelete(ventaId);
