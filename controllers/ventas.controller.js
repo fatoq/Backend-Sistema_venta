@@ -73,8 +73,9 @@ var controller = {
                 ]);
             } else {
                 ventas = await Venta.find({ usuario: req.user.userId })
-                    .populate('usuario', 'nombre apellido')  // Aquí esta el nombre y apellido del empleado
-                    .populate('productos.producto', 'nombre categoria codigoBarra'); // Aquí esta los detalles del producto
+                .populate('productos.producto', 'nombre categoria codigoBarra') // Aquí esta los detalles del producto
+                .populate('usuario', 'nombre apellido');  // Aquí esta el nombre y apellido del empleado
+                    
             }
             if (!ventas || ventas.length == 0) {
                 return res.status(404).send({ message: 'No hay ventas registradas' });  // No hay ventas registradas para este usuario
@@ -92,11 +93,9 @@ var controller = {
         try {
             // Encontrar la venta por ID
             let venta = await Venta.findById(ventaId);
-            
-            console.log('Productos recibidos para actualizar:', productos);
+            console.log('ID encontrada :', ventaId);
             if (!venta) {
-                console.log('Venta no encontrada');
-                return res.status(404).send({message:'Venta no encontrada'});
+              return res.status(404).send({message:'Venta no encontrada'});
             }
             //para actualizar solo los que hacen su propias ventas
             if (req.user.userId.toString() !== venta.usuario.toString()) {
