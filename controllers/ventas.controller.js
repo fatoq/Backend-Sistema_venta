@@ -55,6 +55,17 @@ var controller = {
                     $unwind: '$usuarioDetalle'
                 },
                 {
+                    $lookup:{
+                        from: 'products',
+                        localField: 'productos.producto',
+                        foreignField: '_id',
+                        as: 'productoDetalle'
+                    }
+                },
+                {
+                    $unwind: '$productoDetalle'
+                },
+                {
                     $group: {
                         _id: '$usuario',
                         nombre: { $first: '$usuarioDetalle.nombre' },
@@ -62,7 +73,14 @@ var controller = {
                         ventas: {
                             $push: {
                                 _id: '$_id',
-                                productos: '$productos',
+                                productos: {
+                                    _id: '$productoDetalle._id',
+                                    codigoBarra: '$productoDetalle.codigoBarra',
+                                    nombre: '$productoDetalle.nombre',
+                                    categoria: '$productoDetalle.categoria',
+                                    precio:'$productoDetalle.precio',
+                                },
+                                cantidad: { $first: '$productos.cantidad' },//para tener en numero y no en array
                                 total: '$total',
                                 fecha: '$fecha'
                             }
@@ -71,12 +89,14 @@ var controller = {
                     }
                 }
                 ]);
-            } else {
+                console.log('****resultado****',ventas);
+            } else{
                 ventas = await Venta.find({ usuario: req.user.userId })
-                .populate('productos.producto', 'nombre categoria codigoBarra') // Aquí esta los detalles del producto
+                .populate('productos.producto', 'nombre categoria codigoBarra precio') // Aquí esta los detalles del producto
                 .populate('usuario', 'nombre apellido');  // Aquí esta el nombre y apellido del empleado
                     
             }
+            console.log('****resultado****',ventas);
             if (!ventas || ventas.length == 0) {
                 return res.status(404).send({ message: 'No hay ventas registradas' });  // No hay ventas registradas para este usuario
             }
@@ -95,7 +115,7 @@ var controller = {
             let venta = await Venta.findById(ventaId);
             console.log('ID encontrada :', ventaId);
             if (!venta) {
-              return res.status(404).send({message:'Venta no encontrada'});
+            return res.status(404).send({message:'Venta no encontrada'});
             }
             //para actualizar solo los que hacen su propias ventas
             if (req.user.userId.toString() !== venta.usuario.toString()) {
