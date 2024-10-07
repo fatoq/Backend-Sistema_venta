@@ -43,51 +43,68 @@ var controller = {
         let ventas;
         try {
             if (req.user.role == 'admin') {
-                ventas = await Venta.aggregate([{
-                    $lookup: {
-                        from: 'users',
-                        localField: 'usuario',
-                        foreignField: '_id',
-                        as: 'usuarioDetalle'
-                    }
-                },
-                {
-                    $unwind: '$usuarioDetalle'
-                },
-                {
-                    $lookup:{
-                        from: 'products',
-                        localField: 'productos.producto',
-                        foreignField: '_id',
-                        as: 'productoDetalle'
-                    }
-                },
-                {
-                    $unwind: '$productoDetalle'
-                },
-                {
-                    $group: {
-                        _id: '$usuario',
-                        nombre: { $first: '$usuarioDetalle.nombre' },
-                        apellido: { $first: '$usuarioDetalle.apellido' },
-                        ventas: {
-                            $push: {
-                                _id: '$_id',
-                                productos: {
+                ventas = await Venta.aggregate([
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'usuario',
+                            foreignField: '_id',
+                            as: 'usuarioDetalle'
+                        }
+                    },
+                    {
+                        $unwind: '$usuarioDetalle'
+                    },
+                    {
+                        $lookup: {
+                            from: 'products',
+                            localField: 'productos.producto',
+                            foreignField: '_id',
+                            as: 'productoDetalle'
+                        }
+                    },
+                    {
+                        $unwind: '$productos' // Desenrolla los productos para acceder a cada uno por separado
+                    },
+                    {
+                        $unwind: '$productoDetalle'
+                    },
+                    {
+                        $group: {
+                            _id: '$_id',
+                            usuarioId: { $first: '$usuarioDetalle._id' },
+                            nombre: { $first: '$usuarioDetalle.nombre' },
+                            apellido: { $first: '$usuarioDetalle.apellido' },
+                            productos: {
+                                $push: {
                                     _id: '$productoDetalle._id',
                                     codigoBarra: '$productoDetalle.codigoBarra',
                                     nombre: '$productoDetalle.nombre',
                                     categoria: '$productoDetalle.categoria',
-                                    precio:'$productoDetalle.precio',
-                                },
-                                cantidad: { $first: '$productos.cantidad' },//para tener en numero y no en array
-                                total: '$total',
-                                fecha: '$fecha'
-                            }
-                        },
-                        totalVentas: { $sum: '$total' }
+                                    precio: '$productoDetalle.precio',
+                                    cantidad: '$productos.cantidad' // Aquí obtenemos la cantidad correcta de cada producto
+                                }
+                            },
+                            total: { $first: '$total' }, // Mantener el total de la venta
+                            fecha: { $first: '$fecha' }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: '$usuarioId',
+                            nombre: { $first: '$nombre' },
+                            apellido: { $first: '$apellido' },
+                            ventas: {
+                                $push: {
+                                    _id: '$_id',
+                                    productos: '$productos',
+                                    total: '$total',
+                                    fecha: '$fecha'
+                                }
+                            },
+                            totalVentas: { $sum: '$total' }
+                        }
                     }
-                }
                 ]);
                 console.log('****resultado****',ventas);
             } else{
