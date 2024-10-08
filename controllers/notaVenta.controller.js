@@ -9,7 +9,7 @@ const path = require('path');
 var controller = {
     //validar datos del cliente
     validatecustomerdata: [
-        body('cliente.nombre').isAlpha().withMessage('El nombre solo debe contener letras.'),
+        body('cliente.nombre').matches(/^[a-zA-Z\s]+$/).withMessage('El nombre solo debe contener letras.'),
         body('cliente.ci').isNumeric().withMessage('solo debe ser numeros').isLength({min:10,max: 10 }).withMessage('La cédula de identidad debe tener 10 numeros.'),
         body('cliente.telefono').isNumeric().withMessage('solo debe introducir numeros'),
     ],
@@ -42,15 +42,16 @@ var controller = {
         }catch(err){
             console.log(err);
             res.status(500).send({ message: 'Error al crear la nota de venta', error: err.message });
-        }
-        
+        }  
     },
     genenNotaventa: async function(req, res) {
         const { notaVentaId } = req.params;
         const file=path.join(__dirname,`../Nota_venta_${notaVentaId}.pdf`);
         try {
             if(fs.existsSync(file)){
-                return res.status(200).send({message:'PDF generado'});
+                //return res.status(200).send({message:'PDF generado'});
+                return res.download(file, `Nota_venta_${notaVentaId}.pdf`);
+
             }
             const notaVenta = await NotaVenta.findById(notaVentaId).populate({
                     path: 'venta',
@@ -90,7 +91,9 @@ var controller = {
             doc.end();
             pdfStream.on('finish',function(){
                 console.log('PDF generado correctamente');
-                res.status(200).send({ message: 'PDF generado correctamente' });
+               //res.status(200).send({ message: 'PDF generado correctamente' });
+                res.download(file, `Nota_venta_${notaVentaId}.pdf`);
+
             });
             pdfStream.on('error',function(err){
                 console.error('Error generando PDF:', err);
