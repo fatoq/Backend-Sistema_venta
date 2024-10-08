@@ -12,7 +12,7 @@ router.get('/notas', (req, res) => {
 //para crear una nota
 router.post('/create-nota'
     //, authenticateToken,checkRole(['Super-admin','admin','empleado'])
-    ,notaController.createNotaVenta);
+    ,notaController.validatecustomerdata,notaController.createNotaVenta);
 //para generar la nota en pdf
 router.get('/nota-pdf/:notaVentaId'
     //,authenticateToken,checkRole(['Super-admin','admin','empleado'])

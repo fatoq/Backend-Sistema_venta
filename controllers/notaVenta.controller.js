@@ -1,14 +1,24 @@
 'use strict'
 var NotaVenta = require('../models/cliente');
 var Venta=require('../models/ventas')
-//var Product=require('../models/products')
 const PDFDocument = require('pdfkit');
+const { body, validationResult } = require('express-validator');
 const fs = require('fs');
 const path = require('path');
 
 var controller = {
+    //validar datos del cliente
+    validatecustomerdata: [
+        body('cliente.nombre').isAlpha().withMessage('El nombre solo debe contener letras.'),
+        body('cliente.ci').isNumeric().withMessage('solo debe ser numeros').isLength({min:10,max: 10 }).withMessage('La cédula de identidad debe tener 10 numeros.'),
+        body('cliente.telefono').isNumeric().withMessage('solo debe introducir numeros'),
+    ],
     // Crear una nueva venta
     createNotaVenta: async function (req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
         var {ventaId,cliente} = req.body;
         //Log de los datos recibidos
         console.log('Datos recibidos:', {ventaId,cliente});
