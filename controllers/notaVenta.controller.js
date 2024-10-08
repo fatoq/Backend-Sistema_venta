@@ -46,12 +46,17 @@ var controller = {
     },
     genenNotaventa: async function(req, res) {
         const { notaVentaId } = req.params;
-        const file=path.join(__dirname,`../Nota_venta_${notaVentaId}.pdf`);
+        const directoryPath = path.join(__dirname, '../notas_venta_pdf');
+        //const filePath = path.join(directoryPath, `Nota_venta_${notaVentaId}.pdf`);
+        const file=path.join(directoryPath,`Nota_venta_${notaVentaId}.pdf`);
         try {
+            // Verifica si la carpeta 'notas_venta_pdf' existe, si no, la crea
+            if (!fs.existsSync(directoryPath)) {
+                fs.mkdirSync(directoryPath, { recursive: true });
+            }
             if(fs.existsSync(file)){
                 //return res.status(200).send({message:'PDF generado'});
                 return res.download(file, `Nota_venta_${notaVentaId}.pdf`);
-
             }
             const notaVenta = await NotaVenta.findById(notaVentaId).populate({
                     path: 'venta',
