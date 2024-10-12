@@ -27,14 +27,30 @@ var controller = {
             if (!venta) {
                 return res.status(404).send({ message: 'La venta no existe' });
             }
-            const notaVenta = new NotaVenta({
-                venta: venta._id,
-                cliente: {
+            //ver si el cliente existe
+            let clienteExiste = await NotaVenta.findOne({ 'cliente.ci': cliente.ci });
+            if (!clienteExiste) {
+                clienteExiste={
                     nombre: cliente.nombre,
                     ci: cliente.ci,
                     telefono: cliente.telefono,
                     direccion: cliente.direccion
-                }
+                };
+                console.log('no existe el cliente, se va a crear el usuario');
+            } else{
+                clienteExiste=clienteExiste.cliente;
+                console.log('cliente existente');
+            }
+            const notaVenta = new NotaVenta({
+                venta: venta._id,
+                cliente: clienteExiste
+                /*
+                {
+                    nombre: cliente.nombre,
+                    ci: cliente.ci,
+                    telefono: cliente.telefono,
+                    direccion: cliente.direccion
+                }*/
         });
         console.log('Datos de notaVenta antes de guardar:', notaVenta);
         await notaVenta.save();
