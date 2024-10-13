@@ -122,6 +122,13 @@ var controller = {
             return res.status(500).send({ message: 'Error al obtener las ventas', error: err.message });
         }
     },
+    getcanastos:async function (req,res) {
+
+        
+        
+
+
+    },
     updateVenta: async function (req, res) {
         const {ventaId} = req.params;
         const {productos} = req.body; // Los productos nuevos o actualizados

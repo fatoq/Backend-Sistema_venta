@@ -27,30 +27,23 @@ var controller = {
             if (!venta) {
                 return res.status(404).send({ message: 'La venta no existe' });
             }
-            //ver si el cliente existe
-            let clienteExiste = await NotaVenta.findOne({ 'cliente.ci': cliente.ci });
-            if (!clienteExiste) {
+            //para ver si exite el cliente
+            let clienteExiste=await NotaVenta.findOne({'cliente.ci': cliente.ci });
+            if(!clienteExiste){
                 clienteExiste={
                     nombre: cliente.nombre,
                     ci: cliente.ci,
                     telefono: cliente.telefono,
                     direccion: cliente.direccion
                 };
-                console.log('no existe el cliente, se va a crear el usuario');
-            } else{
+            }else{
                 clienteExiste=clienteExiste.cliente;
-                console.log('cliente existente');
             }
+
+
             const notaVenta = new NotaVenta({
                 venta: venta._id,
-                cliente: clienteExiste
-                /*
-                {
-                    nombre: cliente.nombre,
-                    ci: cliente.ci,
-                    telefono: cliente.telefono,
-                    direccion: cliente.direccion
-                }*/
+                cliente: clienteExiste.cliente
         });
         console.log('Datos de notaVenta antes de guardar:', notaVenta);
         await notaVenta.save();
@@ -59,6 +52,22 @@ var controller = {
             console.log(err);
             res.status(500).send({ message: 'Error al crear la nota de venta', error: err.message });
         }  
+    },
+    //para ver si existe un cliente
+    existeCliente:async function (req,res) {
+        const { ci } = req.params;
+        try {
+            let cliente = await NotaVenta.findOne({ 'cliente.ci': ci });
+            if (!cliente) {
+                return res.status(404).send({ message: 'Cliente no encontrado' });
+            }else{
+                return res.status(200).send({ cliente: cliente.cliente, message: 'Cliente encontrado' });
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(500).send({ message: 'Error al buscar el cliente', error: err.message });
+        }        
+        
     },
     genenNotaventa: async function(req, res) {
         const { notaVentaId } = req.params;

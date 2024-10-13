@@ -9,6 +9,12 @@ const { authenticateToken, checkRole } = require('../middleware/auth');
 router.get('/notas', (req, res) => {
     res.status(200).send('<h1>Bienvenido a la API de Notas</h1>');
 });
+//para ver si hay cliente
+router.get('/verificar-cliente/:ci'
+        //, authenticateToken,checkRole(['Super-admin','admin','empleado'])
+        ,notaController.existeCliente
+);
+
 //para crear una nota
 router.post('/create-nota'
     //, authenticateToken,checkRole(['Super-admin','admin','empleado'])
