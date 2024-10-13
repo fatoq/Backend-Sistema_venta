@@ -12,6 +12,10 @@ router.get('/ventas', (req, res) => {
 router.post('/create-venta',authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.createVenta);
 //para ver todas las ventas
 router.get('/get-ventas', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.getVentas);
+//para ver los canastos
+router.get('/canastos'
+    , authenticateToken,checkRole(['Super-admin','admin','empleado'])
+    ,ventasController.getcanastos);
 //para actualizar una venta
 router.put('/update-venta/:ventaId', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.updateVenta);
 //para borrar una venta

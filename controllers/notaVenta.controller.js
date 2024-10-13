@@ -39,11 +39,9 @@ var controller = {
             }else{
                 clienteExiste=clienteExiste.cliente;
             }
-
-
             const notaVenta = new NotaVenta({
                 venta: venta._id,
-                cliente: clienteExiste.cliente
+                cliente: clienteExiste
         });
         console.log('Datos de notaVenta antes de guardar:', notaVenta);
         await notaVenta.save();

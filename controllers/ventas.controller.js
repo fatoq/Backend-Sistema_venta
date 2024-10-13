@@ -121,14 +121,117 @@ var controller = {
         } catch (err) {
             return res.status(500).send({ message: 'Error al obtener las ventas', error: err.message });
         }
-    },
+    },/*
     getcanastos:async function (req,res) {
-
-        
-        
-
-
+        try{
+            const canastos = await Venta.aggregate([
+                {
+                    $unwind: '$productos'
+                },
+                {
+                    $lookup:{
+                        from: 'products',
+                        localField: 'productos.producto',
+                        foreignField: '_id',
+                        as: 'productoInfo'
+                    }
+                },
+                {
+                    $unwind: '$productoInfo'
+                },
+                {
+                    $addFields: {
+                        precioNumerico: { 
+                            $cond: {
+                                if: { $isNumber: "$productoInfo.precio" },
+                                then: { $toDouble: "$productoInfo.precio" },  // Convertir a double si es un número
+                                else: { $toDecimal: "$productoInfo.precio" }  // Si es decimal128, manejarlo como decimal
+                            }
+                        }
+                    }
+                },
+                {
+                    $group:{
+                        _id: '$productoInfo.categoria',
+                        cantidaVendida:{$sum:'$productos.cantidad'},
+                        ventaTotales:{$sum:{$multiply:['$productos.cantidad', '$productoInfo.precio']}}
+                }
+                },
+                {
+                    $sort: { cantidaVendida: -1 }
+                }
+            ]);
+            const totalVentas=canastos.reduce((acc, item) => acc + item.ventasTotales, 0);
+            const porcentajes=canastos.map(item => ({
+                ...item,
+                porcentajeVentas: ((item.ventasTotales / totalVentas) * 100).toFixed(2)  // Calcular porcentaje de ventas
+        }));
+        return res.status(200).send({porcentajes});
+        }catch(err){
+            return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
+        }
+    },*/
+    getcanastos: async function (req, res) {
+        try {
+            const canastos = await Venta.aggregate([
+                {
+                    $unwind: '$productos'
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'productos.producto',
+                        foreignField: '_id',
+                        as: 'productoInfo'
+                    }
+                },
+                {
+                    $unwind: '$productoInfo'
+                },
+                {
+                    // Convertir el precio a un número válido para la operación
+                    $addFields: {
+                        precioNumerico: {
+                            $cond: {
+                                if: { $isNumber: "$productoInfo.precio" },
+                                then: { $toDouble: "$productoInfo.precio" },  // Convertir a double si es un número
+                                else: { $toDecimal: "$productoInfo.precio" }  // Si es decimal128, manejarlo como decimal
+                            }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$productoInfo.categoria',
+                        cantidaVendida: { $sum: '$productos.cantidad' },
+                        ventaTotales: { $sum: { $multiply: ['$productos.cantidad', '$precioNumerico'] } }  // Usar precioNumerico en lugar de productoInfo.precio
+                    }
+                },
+                {
+                    $sort: { cantidaVendida: -1 }
+                }
+            ]);
+    
+            // Convertir todas las ventas totales a un número para evitar problemas con Decimal128
+            const canastosConvertidos = canastos.map(item => ({
+                ...item,
+                ventaTotales: parseFloat(item.ventaTotales.$numberDecimal || item.ventaTotales)
+            }));
+    
+            const totalVentas = canastosConvertidos.reduce((acc, item) => acc + item.ventaTotales, 0);
+    
+            const porcentajes = canastosConvertidos.map(item => ({
+                ...item,
+                porcentajeVentas: ((item.ventaTotales / totalVentas) * 100).toFixed(2)  // Calcular porcentaje de ventas
+            }));
+    
+            return res.status(200).send({ porcentajes });
+    
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
+        }
     },
+    
     updateVenta: async function (req, res) {
         const {ventaId} = req.params;
         const {productos} = req.body; // Los productos nuevos o actualizados
