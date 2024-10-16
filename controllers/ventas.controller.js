@@ -162,27 +162,82 @@ var controller = {
                     $sort: { cantidaVendida: -1 }
                 }
             ]);
-    
             // Convertir todas las ventas totales a un número para evitar problemas con Decimal128
             const canastosConvertidos = canastos.map(item => ({
                 ...item,
                 ventaTotales: parseFloat(item.ventaTotales.$numberDecimal || item.ventaTotales)
             }));
-    
             const totalVentas = canastosConvertidos.reduce((acc, item) => acc + item.ventaTotales, 0);
-    
             const porcentajes = canastosConvertidos.map(item => ({
                 ...item,
                 porcentajeVentas: ((item.ventaTotales / totalVentas) * 100).toFixed(2)  // Calcular porcentaje de ventas
             }));
-    
             return res.status(200).send({ porcentajes });
-    
         } catch (err) {
             return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
         }
     },
-    
+    getProductosVendidos: async function (req, res) {
+        try {
+            const prodVenta = await Product.aggregate([
+                {
+                    $lookup: {
+                        from: 'venta',
+                        localField: '_id',
+                        foreignField: 'productos.producto',
+                        as: 'ventaInfo'
+                    }
+                },
+                
+            {
+                    $unwind:{ 
+                    path:'$ventaInfo',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields:{
+                    cantidaVendida:{
+                        $cond:{
+                            if:{$gt: ['$ventaInfo',null]},
+                            then:{$sum:'$ventaInfo.productos.cantidad'},
+                            else:0
+                        }
+                    },
+                    totalVentas:{
+                        $cond:{
+                            if:{$gt: ['$ventaInfo',null]},
+                            then:{$multiply:['$ventaInfo.productos.cantidad',{$toDouble:'$precio'}]},
+                            else:0
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    nombre: { $first: '$nombre' },
+                    categoria: { $first: '$categoria' },
+                    cantidadVendida: { $sum: '$cantidadVendida' },  // Sumamos la cantidad vendida de este producto
+                    totalVentas: { $sum: '$totalVentas' }  // Sumamos el total de ventas para este producto
+                }
+            },
+            {
+                $sort: { cantidadVendida: -1 }
+            }
+            ]);
+            const totalVentasG=prodVenta.reduce((acc,item)=> acc + item.totalVentas, 0);
+            const productoEsta=prodVenta.map(item=>({
+                ...item,
+                porcentajeVentas: totalVentasG>0? ((item.totalVentas / totalVentas) * 100).toFixed(2) :0 // Calcular porcentaje de ventas
+            }));
+            return res.status(200).send({productos:productoEsta});
+            
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al obtener los productos vendidos', error: err.message });
+        }
+        
+    },
     updateVenta: async function (req, res) {
         const {ventaId} = req.params;
         const {productos} = req.body; // Los productos nuevos o actualizados
