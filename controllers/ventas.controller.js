@@ -177,6 +177,7 @@ var controller = {
             return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
         }
     },
+    /*
     getProductosVendidos: async function (req, res) {
         try {
             const prodVenta = await Product.aggregate([
@@ -238,6 +239,75 @@ var controller = {
         }
         
     },
+    */
+    getProductosVendidos: async function (req, res) {
+        try {
+            const prodVenta = await Product.aggregate([
+                {
+                    $lookup: {
+                        from: 'ventas',
+                        localField: '_id',
+                        foreignField: 'productos.producto',
+                        as: 'ventaInfo'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$ventaInfo',
+                        preserveNullAndEmptyArrays: true  // Esto garantiza que también se muestren productos que no han sido vendidos
+                    }
+                },
+                {
+                    $addFields: {
+                        // Si hay ventas para este producto, calculamos la cantidad vendida y el total de ventas
+                        cantidadVendida: {
+                            $cond: {
+                                if: { $gt: ['$ventaInfo', null] },
+                                then: { $sum: '$ventaInfo.productos.cantidad' },  // Sumar la cantidad de productos vendidos
+                                else: 0
+                            }
+                        },
+                        totalVentas: {
+                            $cond: {
+                                if: { $gt: ['$ventaInfo', null] },
+                                then: { $multiply: ['$ventaInfo.productos.cantidad', { $toDouble: '$precio' }] },  // Multiplicar cantidad vendida por el precio del producto
+                                else: 0
+                            }
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        nombre: { $first: '$nombre' },
+                        categoria: { $first: '$categoria' },
+                        cantidadVendida: { $sum: '$cantidadVendida' },  // Sumar la cantidad vendida de este producto
+                        totalVentas: { $sum: '$totalVentas' }  // Sumar el total de ventas de este producto
+                    }
+                },
+                {
+                    $sort: { cantidadVendida: -1 }  // Ordenar de mayor a menor por cantidad vendida
+                }
+            ]);
+    
+            // Calcular el total de ventas global
+            const totalVentasGlobal = prodVenta.reduce((acc, item) => acc + item.totalVentas, 0);
+    
+            // Calcular el porcentaje de ventas para cada producto
+            const productosConPorcentaje = prodVenta.map(item => ({
+                ...item,
+                porcentajeVentas: totalVentasGlobal > 0
+                    ? ((item.totalVentas / totalVentasGlobal) * 100).toFixed(2)  // Calcular porcentaje de ventas
+                    : 0
+            }));
+    
+            return res.status(200).send({ productos: productosConPorcentaje });
+    
+        } catch (err) {
+            return res.status(500).send({ message: 'Error al obtener los productos vendidos', error: err.message });
+        }
+    },
+    
     updateVenta: async function (req, res) {
         const {ventaId} = req.params;
         const {productos} = req.body; // Los productos nuevos o actualizados
