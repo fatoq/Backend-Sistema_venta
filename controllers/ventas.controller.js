@@ -177,7 +177,7 @@ var controller = {
             return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
         }
     },
-    /*
+    
     getProductosVendidos: async function (req, res) {
         try {
             const prodVenta = await Product.aggregate([
@@ -198,7 +198,7 @@ var controller = {
             },
             {
                 $addFields:{
-                    cantidaVendida:{
+                    cantidadVendida:{
                         $cond:{
                             if:{$gt: ['$ventaInfo',null]},
                             then:{$sum:'$ventaInfo.productos.cantidad'},
@@ -207,8 +207,8 @@ var controller = {
                     },
                     totalVentas:{
                         $cond:{
-                            if:{$gt: ['$ventaInfo',null]},
-                            then:{$multiply:['$ventaInfo.productos.cantidad',{$toDouble:'$precio'}]},
+                            if:{$gt: ['$ventaInfo', null]},
+                            then:{ $multiply: [{ $sum: '$ventaInfo.productos.cantidad' }, { $toDouble: '$precio' }] },
                             else:0
                         }
                     }
@@ -230,7 +230,7 @@ var controller = {
             const totalVentasG=prodVenta.reduce((acc,item)=> acc + item.totalVentas, 0);
             const productoEsta=prodVenta.map(item=>({
                 ...item,
-                porcentajeVentas: totalVentasG>0? ((item.totalVentas / totalVentas) * 100).toFixed(2) :0 // Calcular porcentaje de ventas
+                porcentajeVentas: totalVentasG>0? ((item.totalVentas / totalVentasG) * 100).toFixed(2) :0 // Calcular porcentaje de ventas
             }));
             return res.status(200).send({productos:productoEsta});
             
@@ -239,8 +239,8 @@ var controller = {
         }
         
     },
-    */
-    getProductosVendidos: async function (req, res) {
+    
+    /*getProductosVendidos: async function (req, res) {
         try {
             const prodVenta = await Product.aggregate([
                 {
@@ -306,7 +306,7 @@ var controller = {
         } catch (err) {
             return res.status(500).send({ message: 'Error al obtener los productos vendidos', error: err.message });
         }
-    },
+    },*/
     
     updateVenta: async function (req, res) {
         const {ventaId} = req.params;
