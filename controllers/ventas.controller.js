@@ -177,69 +177,6 @@ var controller = {
             return res.status(500).send({ message: 'Error al obtener las estadísticas por categoría', error: err.message });
         }
     },
-    /*
-    getProductosVendidos: async function (req, res) {
-        try {
-            const prodVenta = await Product.aggregate([
-                {
-                    $lookup: {
-                        from: 'venta',
-                        localField: '_id',
-                        foreignField: 'productos.producto',
-                        as: 'ventaInfo'
-                    }
-                },
-                
-            {
-                    $unwind:{ 
-                    path:'$ventaInfo',
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $addFields:{
-                    cantidadVendida:{
-                        $cond:{
-                            if:{$gt: ['$ventaInfo',null]},
-                            then:{$sum:'$ventaInfo.productos.cantidad'},
-                            else:0
-                        }
-                    },
-                    totalVentas:{
-                        $cond:{
-                            if:{$gt: ['$ventaInfo', null]},
-                            then:{ $multiply: [{ $sum: '$ventaInfo.productos.cantidad' }, { $toDouble: '$precio' }] },
-                            else:0
-                        }
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    nombre: { $first: '$nombre' },
-                    categoria: { $first: '$categoria' },
-                    cantidadVendida: { $sum: '$cantidadVendida' },  // Sumamos la cantidad vendida de este producto
-                    totalVentas: { $sum: '$totalVentas' }  // Sumamos el total de ventas para este producto
-                }
-            },
-            {
-                $sort: { cantidadVendida: -1 }
-            }
-            ]);
-            const totalVentasG=prodVenta.reduce((acc,item)=> acc + item.totalVentas, 0);
-            const productoEsta=prodVenta.map(item=>({
-                ...item,
-                porcentajeVentas: totalVentasG>0? ((item.totalVentas / totalVentasG) * 100).toFixed(2) :0 // Calcular porcentaje de ventas
-            }));
-            return res.status(200).send({productos:productoEsta});
-            
-        } catch (err) {
-            return res.status(500).send({ message: 'Error al obtener los productos vendidos', error: err.message });
-        }
-        
-    },
-    */
     getProductosVendidos: async function (req, res) {
         try {
             const prodVenta = await Product.aggregate([

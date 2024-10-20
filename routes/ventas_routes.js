@@ -15,9 +15,7 @@ router.get('/get-ventas', authenticateToken,checkRole(['Super-admin','admin','em
 //para ver los canastos
 router.get('/canastos', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.getcanastos);
 //para ver los mejores productos vendidos 
-router.get('/mejores-productos'
-    //, authenticateToken,checkRole(['Super-admin','admin','empleado'])
-    ,ventasController.getProductosVendidos);
+router.get('/mejores-productos', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.getProductosVendidos);
 //para actualizar una venta
 router.put('/update-venta/:ventaId', authenticateToken,checkRole(['Super-admin','admin','empleado']),ventasController.updateVenta);
 //para borrar una venta
